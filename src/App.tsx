@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom'
 import Home from './pages/Home'
 import ComparisonGenerator from './pages/ComparisonGenerator'
 import { useTheme } from './useTheme'
-import type { Theme } from './useTheme'
 
 export default function App() {
   const { theme, setTheme } = useTheme()
