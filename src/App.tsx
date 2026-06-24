@@ -39,7 +39,7 @@ export default function App() {
       <Navbar>
         <NavbarGroup>
           <NavbarHeading>
-            <Link to="/">Tools</Link>
+            <Link to="/">tools<span style={{ fontSize: '0.7em' }}>.sker.lol</span></Link>
           </NavbarHeading>
           <NavbarDivider />
           <ButtonGroup minimal>
