@@ -1,0 +1,73 @@
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #f6f7f9;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.tool-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+.bp5-navbar a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.comparison-preview {
+  position: relative;
+  width: 100%;
+  border: 1px solid rgba(16, 22, 26, 0.15);
+  border-radius: 3px;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.comparison-preview canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.comparison-slider {
+  margin-top: 12px;
+}
+
+.image-inputs {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 600px) {
+  .image-inputs {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.text-options {
+  margin-bottom: 20px;
+  padding: 12px;
+  border: 1px solid rgba(16, 22, 26, 0.15);
+  border-radius: 3px;
+  background: #fff;
+}
+
+.text-options .bp5-checkbox {
+  margin-bottom: 0;
+}
+
+.text-options .image-inputs {
+  margin-bottom: 12px;
+}
+
+.text-options .image-inputs:last-child {
+  margin-bottom: 0;
+  display: flex;
+  gap: 24px;
+}
