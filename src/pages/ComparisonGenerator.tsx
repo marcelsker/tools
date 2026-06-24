@@ -66,6 +66,7 @@ export default function ComparisonGenerator() {
 
   async function loadFile(side: 'a' | 'b', file: File) {
     if (!file) return
+    console.log('loadFile', side, file.name)
 
     const setLoad = side === 'a' ? setLoadingA : setLoadingB
     const setImage = side === 'a' ? setImageA : setImageB
@@ -89,17 +90,20 @@ export default function ComparisonGenerator() {
   ) {
     const file = e.currentTarget.files?.[0]
     if (!file) return
+    console.log('handleFile', side, file.name)
     loadFile(side, file)
   }
 
   function handleDragOver(side: 'a' | 'b', e: React.DragEvent) {
     e.preventDefault()
     e.stopPropagation()
+    console.log('dragOver', side)
     if (side === 'a') setDragOverA(true)
     else setDragOverB(true)
   }
 
   function handleDragLeave(side: 'a' | 'b') {
+    console.log('dragLeave', side)
     if (side === 'a') setDragOverA(false)
     else setDragOverB(false)
   }
@@ -107,6 +111,7 @@ export default function ComparisonGenerator() {
   function handleDrop(side: 'a' | 'b', e: React.DragEvent) {
     e.preventDefault()
     e.stopPropagation()
+    console.log('drop', side)
     if (side === 'a') setDragOverA(false)
     else setDragOverB(false)
     const file = e.dataTransfer.files?.[0]
@@ -164,6 +169,7 @@ export default function ComparisonGenerator() {
 
   function download() {
     if (!canvasRef.current || !imageA || !imageB) return
+    console.log('download')
 
     const isHighRes =
       imageA.naturalWidth > HIGH_RES_THRESHOLD ||
@@ -184,6 +190,7 @@ export default function ComparisonGenerator() {
   }
 
   function handleDownloadConfirm() {
+    console.log('downloadConfirm', selectedRes)
     const canvas = canvasRef.current
     if (!canvas) return
     const scale = selectedRes === 'high'
@@ -252,14 +259,14 @@ export default function ComparisonGenerator() {
           stepSize={1}
           labelStepSize={25}
           value={split}
-          onChange={setSplit}
+          onChange={(v) => { console.log('split', v); setSplit(v) }}
           disabled={!ready}
         />
       </FormGroup>
 
       <Checkbox
         checked={addText}
-        onChange={(e) => setAddText(e.target.checked)}
+        onChange={(e) => { console.log('addText', e.target.checked); setAddText(e.target.checked) }}
         label="Add text"
       />
 
@@ -270,14 +277,14 @@ export default function ComparisonGenerator() {
               <InputGroup
                 id="label-a"
                 value={labelA}
-                onChange={(e) => setLabelA(e.target.value)}
+                onChange={(e) => { console.log('labelA', e.target.value); setLabelA(e.target.value) }}
               />
             </FormGroup>
             <FormGroup label="Label B" labelFor="label-b">
               <InputGroup
                 id="label-b"
                 value={labelB}
-                onChange={(e) => setLabelB(e.target.value)}
+                onChange={(e) => { console.log('labelB', e.target.value); setLabelB(e.target.value) }}
               />
             </FormGroup>
           </div>
@@ -288,7 +295,7 @@ export default function ComparisonGenerator() {
               max={20}
               stepSize={1}
               value={textFontSize}
-              onChange={setTextFontSize}
+                  onChange={(v) => { console.log('textFontSize', v); setTextFontSize(v) }}
               labelStepSize={4}
             />
           </FormGroup>
@@ -299,7 +306,7 @@ export default function ComparisonGenerator() {
                 id="text-color"
                 type="color"
                 value={textColor}
-                onChange={(e) => setTextColor(e.target.value)}
+                onChange={(e) => { console.log('textColor', e.target.value); setTextColor(e.target.value) }}
                 style={{ width: '100%', height: 32, padding: 0, border: 'none', cursor: 'pointer' }}
               />
             </FormGroup>
@@ -307,7 +314,7 @@ export default function ComparisonGenerator() {
               <HTMLSelect
                 id="text-position"
                 value={textPosition}
-                onChange={(e) => setTextPosition(e.target.value as 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right')}
+                onChange={(e) => { const v = e.target.value as 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'; console.log('textPosition', v); setTextPosition(v) }}
                 options={[
                   { label: 'Top Left', value: 'top-left' },
                   { label: 'Top Right', value: 'top-right' },
@@ -322,12 +329,12 @@ export default function ComparisonGenerator() {
           <div className="image-inputs">
             <Checkbox
               checked={textBold}
-              onChange={(e) => setTextBold(e.target.checked)}
+              onChange={(e) => { console.log('textBold', e.target.checked); setTextBold(e.target.checked) }}
               label="Bold"
             />
             <Checkbox
               checked={textBackground}
-              onChange={(e) => setTextBackground(e.target.checked)}
+              onChange={(e) => { console.log('textBackground', e.target.checked); setTextBackground(e.target.checked) }}
               label="Background"
             />
           </div>
@@ -353,7 +360,7 @@ export default function ComparisonGenerator() {
             />
             <HTMLSelect
               value={format}
-              onChange={(e) => setFormat(e.target.value as typeof format)}
+              onChange={(e) => { const v = e.target.value as typeof format; console.log('format', v); setFormat(v) }}
               options={[
                 { label: 'PNG', value: 'png' },
                 { label: 'WebP', value: 'webp' },
@@ -366,7 +373,7 @@ export default function ComparisonGenerator() {
 
       <Dialog
         isOpen={resDialogOpen}
-        onClose={() => { if (!downloading) setResDialogOpen(false) }}
+        onClose={() => { console.log('dialogClose'); if (!downloading) setResDialogOpen(false) }}
         title="Download Resolution"
         icon="duplicate"
         canOutsideClickClose={!downloading}
@@ -378,7 +385,7 @@ export default function ComparisonGenerator() {
           </p>
           <RadioGroup
             selectedValue={selectedRes}
-            onChange={(e) => setSelectedRes(e.currentTarget.value as 'high' | 'normal')}
+            onChange={(e) => { const v = e.currentTarget.value as 'high' | 'normal'; console.log('selectedRes', v); setSelectedRes(v) }}
             disabled={downloading}
           >
             <Radio
@@ -393,7 +400,7 @@ export default function ComparisonGenerator() {
         </div>
         <div className={Classes.DIALOG_FOOTER}>
           <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-            <Button onClick={() => setResDialogOpen(false)} disabled={downloading}>Cancel</Button>
+            <Button onClick={() => { console.log('dialogCancel'); setResDialogOpen(false) }} disabled={downloading}>Cancel</Button>
             <Button intent={Intent.PRIMARY} onClick={handleDownloadConfirm} loading={downloading && resDialogOpen}>
               Download
             </Button>

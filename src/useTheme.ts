@@ -23,5 +23,5 @@ export function useTheme() {
     }
   }, [theme])
 
-  return { theme, setTheme: (t: Theme) => { localStorage.setItem('theme', t); setTheme(t) } }
+  return { theme, setTheme: (t: Theme) => { console.log('theme', t); localStorage.setItem('theme', t); setTheme(t) } }
 }
