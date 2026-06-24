@@ -1,14 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   Button,
   Checkbox,
+  Classes,
+  Dialog,
   FileInput,
   FormGroup,
   H3,
   HTMLSelect,
   InputGroup,
-  Slider,
   Intent,
+  Radio,
+  RadioGroup,
+  Slider,
 } from '@blueprintjs/core'
 import { drawComparison, loadImage } from '../lib/comparison'
 
@@ -18,6 +23,8 @@ export default function ComparisonGenerator() {
   const [imageB, setImageB] = useState<HTMLImageElement | null>(null)
   const [fileNameA, setFileNameA] = useState<string | null>(null)
   const [fileNameB, setFileNameB] = useState<string | null>(null)
+  const [loadingA, setLoadingA] = useState(false)
+  const [loadingB, setLoadingB] = useState(false)
   const [split, setSplit] = useState(50)
   const [error, setError] = useState<string | null>(null)
   const [addText, setAddText] = useState(false)
@@ -28,6 +35,15 @@ export default function ComparisonGenerator() {
   const [textPosition, setTextPosition] = useState<'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'>('top-left')
   const [textBold, setTextBold] = useState(true)
   const [textBackground, setTextBackground] = useState(true)
+  const [dragOverA, setDragOverA] = useState(false)
+  const [dragOverB, setDragOverB] = useState(false)
+  const [resDialogOpen, setResDialogOpen] = useState(false)
+  const [selectedRes, setSelectedRes] = useState<'high' | 'normal'>('normal')
+  const [downloading, setDownloading] = useState(false)
+  const [format, setFormat] = useState<'png' | 'webp' | 'jpeg'>('png')
+
+  const HIGH_RES_THRESHOLD = 1920
+  const NORMAL_RES_MAX = 1920
 
   const render = useCallback(() => {
     const canvas = canvasRef.current
@@ -48,43 +64,151 @@ export default function ComparisonGenerator() {
     render()
   }, [render])
 
-  async function handleFile(
+  async function loadFile(side: 'a' | 'b', file: File) {
+    if (!file) return
+
+    const setLoad = side === 'a' ? setLoadingA : setLoadingB
+    const setImage = side === 'a' ? setImageA : setImageB
+    const setFileName = side === 'a' ? setFileNameA : setFileNameB
+    setLoad(true)
+    try {
+      setError(null)
+      const img = await loadImage(file)
+      setImage(img)
+      setFileName(file.name)
+    } catch {
+      setError('Could not load that image.')
+    } finally {
+      setLoad(false)
+    }
+  }
+
+  function handleFile(
     side: 'a' | 'b',
     e: React.FormEvent<HTMLInputElement>,
   ) {
     const file = e.currentTarget.files?.[0]
     if (!file) return
+    loadFile(side, file)
+  }
 
-    try {
-      setError(null)
-      const img = await loadImage(file)
-      if (side === 'a') {
-        setImageA(img)
-        setFileNameA(file.name)
-      } else {
-        setImageB(img)
-        setFileNameB(file.name)
-      }
-    } catch {
-      setError('Could not load that image.')
+  function handleDragOver(side: 'a' | 'b', e: React.DragEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    if (side === 'a') setDragOverA(true)
+    else setDragOverB(true)
+  }
+
+  function handleDragLeave(side: 'a' | 'b') {
+    if (side === 'a') setDragOverA(false)
+    else setDragOverB(false)
+  }
+
+  function handleDrop(side: 'a' | 'b', e: React.DragEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    if (side === 'a') setDragOverA(false)
+    else setDragOverB(false)
+    const file = e.dataTransfer.files?.[0]
+    if (!file || !file.type.startsWith('image/')) return
+    loadFile(side, file)
+  }
+
+  function getTextOptions() {
+    return addText ? {
+      labelA, labelB,
+      fontSize: textFontSize,
+      color: textColor,
+      position: textPosition,
+      bold: textBold,
+      background: textBackground,
+    } : undefined
+  }
+
+  const MIME: Record<typeof format, string> = { png: 'image/png', webp: 'image/webp', jpeg: 'image/jpeg' }
+
+  function doExport(scale: number) {
+    const canvas = canvasRef.current
+    if (!canvas || !imageA || !imageB) return
+
+    const outW = Math.round(canvas.width * scale)
+    const outH = Math.round(canvas.height * scale)
+
+    const offscreen = document.createElement('canvas')
+    offscreen.width = outW
+    offscreen.height = outH
+    const ctx = offscreen.getContext('2d')
+    if (!ctx) return
+
+    if (scale === 1) {
+      drawComparison(ctx, imageA, imageB, split, getTextOptions())
+    } else {
+      const temp = document.createElement('canvas')
+      temp.width = canvas.width
+      temp.height = canvas.height
+      const tempCtx = temp.getContext('2d')
+      if (!tempCtx) return
+      drawComparison(tempCtx, imageA, imageB, split, getTextOptions())
+      ctx.drawImage(temp, 0, 0, outW, outH)
     }
+
+    const link = document.createElement('a')
+    link.download = `comparison.${format}`
+    offscreen.toBlob((blob) => {
+      if (!blob) return
+      link.href = URL.createObjectURL(blob)
+      link.click()
+      URL.revokeObjectURL(link.href)
+    }, MIME[format])
   }
 
   function download() {
+    if (!canvasRef.current || !imageA || !imageB) return
+
+    const isHighRes =
+      imageA.naturalWidth > HIGH_RES_THRESHOLD ||
+      imageA.naturalHeight > HIGH_RES_THRESHOLD ||
+      imageB.naturalWidth > HIGH_RES_THRESHOLD ||
+      imageB.naturalHeight > HIGH_RES_THRESHOLD
+
+    if (isHighRes) {
+      setSelectedRes('normal')
+      setResDialogOpen(true)
+    } else {
+      setDownloading(true)
+      setTimeout(() => {
+        doExport(1)
+        setDownloading(false)
+      }, 0)
+    }
+  }
+
+  function handleDownloadConfirm() {
     const canvas = canvasRef.current
-    if (!canvas || !imageA || !imageB) return
-    const link = document.createElement('a')
-    link.download = 'comparison.png'
-    link.href = canvas.toDataURL('image/png')
-    link.click()
+    if (!canvas) return
+    const scale = selectedRes === 'high'
+      ? 1
+      : Math.min(NORMAL_RES_MAX / canvas.width, NORMAL_RES_MAX / canvas.height, 1)
+
+    setDownloading(true)
+    setTimeout(() => {
+      doExport(scale)
+      setDownloading(false)
+      setResDialogOpen(false)
+    }, 0)
   }
 
   const ready = imageA && imageB
 
   return (
     <div className="tool-page">
+      <p className={Classes.TEXT_MUTED} style={{ marginBottom: 8, fontSize: 14 }}>
+        <Link to="/">Home</Link>
+        <span style={{ margin: '0 6px' }}>/</span>
+        Comparison Generator
+      </p>
       <H3>Comparison Generator</H3>
-      <p style={{ color: '#5c7080', marginTop: 8 }}>
+      <p className={Classes.TEXT_MUTED} style={{ marginTop: 8 }}>
         Upload two images and set the split point. The result is half the source
         width — left from image A, right from image B.
       </p>
@@ -93,17 +217,29 @@ export default function ComparisonGenerator() {
         <FormGroup label="Image A" labelFor="image-a">
           <FileInput
             id="image-a"
-            text={imageA ? fileNameA! : 'Choose image…'}
+            fill
+            className={dragOverA ? 'bp5-file-drop-active' : undefined}
+            text={loadingA ? 'Loading…' : (imageA ? fileNameA! : 'Choose image…')}
             onInputChange={(e) => handleFile('a', e)}
             inputProps={{ accept: 'image/*' }}
+            disabled={loadingA}
+            onDragOver={(e) => handleDragOver('a', e)}
+            onDragLeave={() => handleDragLeave('a')}
+            onDrop={(e) => handleDrop('a', e)}
           />
         </FormGroup>
         <FormGroup label="Image B" labelFor="image-b">
           <FileInput
             id="image-b"
-            text={imageB ? fileNameB! : 'Choose image…'}
+            fill
+            className={dragOverB ? 'bp5-file-drop-active' : undefined}
+            text={loadingB ? 'Loading…' : (imageB ? fileNameB! : 'Choose image…')}
             onInputChange={(e) => handleFile('b', e)}
             inputProps={{ accept: 'image/*' }}
+            disabled={loadingB}
+            onDragOver={(e) => handleDragOver('b', e)}
+            onDragLeave={() => handleDragLeave('b')}
+            onDrop={(e) => handleDrop('b', e)}
           />
         </FormGroup>
       </div>
@@ -199,7 +335,7 @@ export default function ComparisonGenerator() {
       )}
 
       {error && (
-        <p style={{ color: '#c23030', marginTop: 12 }}>{error}</p>
+        <p className="error-text" style={{ marginTop: 12 }}>{error}</p>
       )}
 
       {ready && (
@@ -207,15 +343,63 @@ export default function ComparisonGenerator() {
           <div className="comparison-preview" style={{ marginTop: 20 }}>
             <canvas ref={canvasRef} />
           </div>
-          <Button
-            intent={Intent.PRIMARY}
-            icon="download"
-            text="Download PNG"
-            onClick={download}
-            style={{ marginTop: 16 }}
-          />
+          <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+            <Button
+              intent={Intent.PRIMARY}
+              icon="download"
+              text="Download"
+              onClick={download}
+              loading={downloading && !resDialogOpen}
+            />
+            <HTMLSelect
+              value={format}
+              onChange={(e) => setFormat(e.target.value as typeof format)}
+              options={[
+                { label: 'PNG', value: 'png' },
+                { label: 'WebP', value: 'webp' },
+                { label: 'JPEG', value: 'jpeg' },
+              ]}
+            />
+          </div>
         </>
       )}
+
+      <Dialog
+        isOpen={resDialogOpen}
+        onClose={() => { if (!downloading) setResDialogOpen(false) }}
+        title="Download Resolution"
+        icon="duplicate"
+        canOutsideClickClose={!downloading}
+      >
+        <div className={Classes.DIALOG_BODY}>
+          <p>
+            The uploaded images are high resolution. How would you like to
+            download the comparison?
+          </p>
+          <RadioGroup
+            selectedValue={selectedRes}
+            onChange={(e) => setSelectedRes(e.currentTarget.value as 'high' | 'normal')}
+            disabled={downloading}
+          >
+            <Radio
+              label="High Resolution (original size)"
+              value="high"
+            />
+            <Radio
+              label={`Normal Resolution (max ${NORMAL_RES_MAX}px).`}
+              value="normal"
+            />
+          </RadioGroup>
+        </div>
+        <div className={Classes.DIALOG_FOOTER}>
+          <div className={Classes.DIALOG_FOOTER_ACTIONS}>
+            <Button onClick={() => setResDialogOpen(false)} disabled={downloading}>Cancel</Button>
+            <Button intent={Intent.PRIMARY} onClick={handleDownloadConfirm} loading={downloading && resDialogOpen}>
+              Download
+            </Button>
+          </div>
+        </div>
+      </Dialog>
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { Card, H3, Tag } from '@blueprintjs/core'
+import { Card, Classes, H3 } from '@blueprintjs/core'
 import { Link } from 'react-router-dom'
 import { tools } from '../tools'
 
@@ -12,9 +12,8 @@ export default function Home() {
             <Card interactive>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <strong>{tool.name}</strong>
-                <Tag minimal>client</Tag>
               </div>
-              <p style={{ margin: '8px 0 0', color: '#5c7080' }}>{tool.description}</p>
+              <p className={Classes.TEXT_MUTED} style={{ margin: '8px 0 0' }}>{tool.description}</p>
             </Card>
           </Link>
         ))}

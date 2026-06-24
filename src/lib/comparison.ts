@@ -83,9 +83,9 @@ export function drawComparison(
     }
 
     const positions = {
-      'top-left': (bw: number) => ({ x: padding, y: padding }),
+      'top-left': (_bw: number) => ({ x: padding, y: padding }),
       'top-right': (bw: number) => ({ x: (leftOutW > 0 ? leftOutW : outW) - bw - padding, y: padding }),
-      'bottom-left': (bw: number) => ({ x: padding, y: outH - fontSize - padding * 3 }),
+      'bottom-left': (_bw: number) => ({ x: padding, y: outH - fontSize - padding * 3 }),
       'bottom-right': (bw: number) => ({ x: (leftOutW > 0 ? leftOutW : outW) - bw - padding, y: outH - fontSize - padding * 3 }),
     }
 

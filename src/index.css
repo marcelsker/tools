@@ -4,6 +4,10 @@ body {
   background: #f6f7f9;
 }
 
+html.bp5-dark body {
+  background: #252a31;
+}
+
 #root {
   min-height: 100vh;
 }
@@ -19,6 +23,35 @@ body {
   text-decoration: none;
 }
 
+html.bp5-dark .bp5-navbar a {
+  color: #f6f7f9;
+}
+
+.error-text {
+  color: #c23030;
+}
+
+html.bp5-dark .bp5-slider-label {
+  color: #abb3bf;
+}
+
+html.bp5-dark .bp5-card {
+  color: #f6f7f9;
+}
+
+html.bp5-dark .error-text {
+  color: #f55656;
+}
+
+.bp5-file-drop-active {
+  box-shadow: 0 0 0 2px #2d72d2;
+  border-radius: 3px;
+}
+
+html.bp5-dark .bp5-file-drop-active {
+  box-shadow: 0 0 0 2px #8abbff;
+}
+
 .comparison-preview {
   position: relative;
   width: 100%;
@@ -26,6 +59,10 @@ body {
   border-radius: 3px;
   overflow: hidden;
   line-height: 0;
+}
+
+html.bp5-dark .comparison-preview {
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .comparison-preview canvas {
@@ -56,6 +93,11 @@ body {
   border: 1px solid rgba(16, 22, 26, 0.15);
   border-radius: 3px;
   background: #fff;
+}
+
+html.bp5-dark .text-options {
+  background: #2f343c;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .text-options .bp5-checkbox {
