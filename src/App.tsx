@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Route, Routes } from 'react-router-dom'
-import { HTMLSelect, Navbar, NavbarDivider, NavbarGroup, NavbarHeading } from '@blueprintjs/core'
+import { Button, ButtonGroup, Navbar, NavbarDivider, NavbarGroup, NavbarHeading } from '@blueprintjs/core'
 import { Link } from 'react-router-dom'
 import Home from './pages/Home'
 import ComparisonGenerator from './pages/ComparisonGenerator'
@@ -42,15 +42,11 @@ export default function App() {
             <Link to="/">Tools</Link>
           </NavbarHeading>
           <NavbarDivider />
-          <HTMLSelect
-            value={theme}
-            onChange={(e) => setTheme(e.currentTarget.value as Theme)}
-            options={[
-              { label: 'System', value: 'system' },
-              { label: 'Light', value: 'light' },
-              { label: 'Dark', value: 'dark' },
-            ]}
-          />
+          <ButtonGroup minimal>
+            <Button icon="desktop" active={theme === 'system'} onClick={() => setTheme('system')} />
+            <Button icon="flash" active={theme === 'light'} onClick={() => setTheme('light')} />
+            <Button icon="moon" active={theme === 'dark'} onClick={() => setTheme('dark')} />
+          </ButtonGroup>
         </NavbarGroup>
       </Navbar>
       <Routes>
