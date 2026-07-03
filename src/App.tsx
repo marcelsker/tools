@@ -3,6 +3,7 @@ import { Button, ButtonGroup, Navbar, NavbarDivider, NavbarGroup, NavbarHeading 
 import { Link } from 'react-router-dom'
 import Home from './pages/Home'
 import ComparisonGenerator from './pages/ComparisonGenerator'
+import TextCaseConverter from './pages/TextCaseConverter'
 import { useTheme } from './useTheme'
 
 export default function App() {
@@ -26,6 +27,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/comparison-generator" element={<ComparisonGenerator />} />
+        <Route path="/text-case-converter" element={<TextCaseConverter />} />
       </Routes>
     </>
   )

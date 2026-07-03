@@ -12,4 +12,10 @@ export const tools: Tool[] = [
     description: 'Combine two images into a half-width comparison with an adjustable split.',
     path: '/comparison-generator',
   },
+  {
+    id: 'text-case-converter',
+    name: 'Text Case Converter',
+    description: 'Transform text between different letter cases.',
+    path: '/text-case-converter',
+  },
 ]
