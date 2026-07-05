@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Button, H3, TextArea, Classes, Intent } from '@blueprintjs/core'
+import { Button, H3, TextArea, Classes, Intent, type IconName } from '@blueprintjs/core'
 import {
   sentenceCase,
   lowerCase,
@@ -21,7 +21,7 @@ const CASE_LABELS: Record<CaseKey, string> = {
   inverse: 'InVeRsE CaSe',
 }
 
-const CASE_ICONS: Record<CaseKey, string> = {
+const CASE_ICONS: Record<CaseKey, IconName> = {
   sentence: 'paragraph',
   lower: 'symbol-triangle-down',
   upper: 'symbol-triangle-up',
