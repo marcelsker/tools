@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom'
 import { Button, ButtonGroup, Navbar, NavbarDivider, NavbarGroup, NavbarHeading } from '@blueprintjs/core'
 import { Link } from 'react-router-dom'
 import Home from './pages/Home'
+import BatchPhotoConverter from './pages/BatchPhotoConverter'
 import ComparisonGenerator from './pages/ComparisonGenerator'
 import TextCaseConverter from './pages/TextCaseConverter'
 import { useTheme } from './useTheme'
@@ -26,6 +27,7 @@ export default function App() {
       </Navbar>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/batch-photo-converter" element={<BatchPhotoConverter />} />
         <Route path="/comparison-generator" element={<ComparisonGenerator />} />
         <Route path="/text-case-converter" element={<TextCaseConverter />} />
       </Routes>

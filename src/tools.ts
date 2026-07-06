@@ -18,4 +18,10 @@ export const tools: Tool[] = [
     description: 'Transform text between different letter cases.',
     path: '/text-case-converter',
   },
+  {
+    id: 'batch-photo-converter',
+    name: 'Batch Photo Converter',
+    description: 'Convert multiple images between formats, resize, and download individually or as a ZIP.',
+    path: '/batch-photo-converter',
+  },
 ]
