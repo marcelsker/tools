@@ -150,7 +150,6 @@ export default function BatchPhotoConverter() {
 
       <FileInput
         fill
-        multiple
         className={dragOver ? 'bp5-file-drop-active' : undefined}
         text={images.length === 0 ? 'Choose images or drop them here…' : `${images.length} selected`}
         onInputChange={handleFileInput}
@@ -195,15 +194,16 @@ export default function BatchPhotoConverter() {
           </div>
           <div style={{ marginTop: 8, display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
             {showQualitySlider && (
-              <Slider
-                min={1}
-                max={100}
-                stepSize={1}
-                labelStepSize={50}
-                value={quality}
-                onChange={v => setQuality(v)}
-                style={{ width: 120 }}
-              />
+              <div style={{ width: 120 }}>
+                <Slider
+                  min={1}
+                  max={100}
+                  stepSize={1}
+                  labelStepSize={50}
+                  value={quality}
+                  onChange={v => setQuality(v)}
+                />
+              </div>
             )}
             <InputGroup
               type="number"

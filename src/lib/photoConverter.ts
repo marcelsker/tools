@@ -109,7 +109,6 @@ export function convertImage(
     }
 
     const mime = mimeMap[options.format]
-    const ext = options.format === 'jpeg' ? 'jpg' : options.format
 
     const quality = options.format === 'png' || options.format === 'bmp' ? undefined : options.quality
 
